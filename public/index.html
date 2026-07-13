@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Unified QR Platform</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== AUTH SCREEN ===== -->
+  <section id="authScreen" class="auth-screen">
+    <div class="auth-shell">
+      <div class="auth-brand-panel">
+        <div class="brand">
+          <span class="brand-mark">◱</span>
+          <span class="brand-name">Unified QR</span>
+        </div>
+        <h1 class="auth-headline">One QR code.<br>Every destination.</h1>
+        <p class="auth-subline">Generate, customize, and track static &amp; dynamic QR codes from a single dashboard.</p>
+        <ul class="auth-features">
+          <li><span class="check">✓</span> Dynamic codes you can redirect anytime</li>
+          <li><span class="check">✓</span> Full scan analytics, per code</li>
+          <li><span class="check">✓</span> Custom colors, exportable PNGs</li>
+        </ul>
+      </div>
+
+      <div class="auth-card">
+        <div class="auth-card-mobile-brand">
+          <span class="brand-mark">◱</span>
+          <span class="brand-name">Unified QR</span>
+        </div>
+        <div class="tab-switch">
+          <button class="tab-btn active" data-tab="signin">Sign In</button>
+          <button class="tab-btn" data-tab="signup">Create Account</button>
+        </div>
+
+        <form id="signinForm" class="auth-form active">
+          <label>Email
+            <input type="email" name="email" required autocomplete="email" />
+          </label>
+          <label>Password
+            <input type="password" name="password" required autocomplete="current-password" />
+          </label>
+          <button type="submit" class="btn-primary">Sign in</button>
+          <p class="form-error" id="signinError"></p>
+        </form>
+
+        <form id="signupForm" class="auth-form">
+          <label>Name
+            <input type="text" name="name" required autocomplete="name" />
+          </label>
+          <label>Email
+            <input type="email" name="email" required autocomplete="email" />
+          </label>
+          <label>Password
+            <input type="password" name="password" required minlength="6" autocomplete="new-password" />
+          </label>
+          <button type="submit" class="btn-primary">Create account</button>
+          <p class="form-error" id="signupError"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DASHBOARD ===== -->
+  <section id="dashboardScreen" class="dashboard-screen hidden">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">◱</span>
+        <span class="brand-name">Unified QR</span>
+      </div>
+      <div class="topbar-right">
+        <div class="user-chip-wrap">
+          <span class="avatar-circle" id="avatarCircle">•</span>
+          <span class="user-chip" id="userChip">—</span>
+        </div>
+        <button class="btn-ghost" id="logoutBtn">Log out</button>
+      </div>
+    </header>
+
+    <main class="dash-main">
+      <div class="dash-head">
+        <div>
+          <h1>Your QR codes</h1>
+          <p class="dash-sub" id="qrCount">0 codes generated</p>
+        </div>
+        <button class="btn-primary" id="newQrBtn">+ New QR code</button>
+      </div>
+
+      <!-- New QR panel -->
+      <div class="new-qr-panel hidden" id="newQrPanel">
+        <div class="panel-grid">
+          <form id="newQrForm">
+            <label>Title
+              <input type="text" name="title" placeholder="e.g. Menu, Portfolio link, Wi-Fi" required />
+            </label>
+            <label>Destination URL
+              <input type="url" name="destination" placeholder="https://example.com" required />
+            </label>
+
+            <div class="type-switch">
+              <label class="radio-chip">
+                <input type="radio" name="type" value="dynamic" checked />
+                <span>Dynamic <em>editable · tracked</em></span>
+              </label>
+              <label class="radio-chip">
+                <input type="radio" name="type" value="static" />
+                <span>Static <em>fixed · direct</em></span>
+              </label>
+            </div>
+
+            <div class="color-row">
+              <label>Foreground
+                <input type="color" name="foregroundColor" value="#0A0E17" />
+              </label>
+              <label>Background
+                <input type="color" name="backgroundColor" value="#FFFFFF" />
+              </label>
+            </div>
+
+            <div class="panel-actions">
+              <button type="button" class="btn-ghost" id="cancelNewQr">Cancel</button>
+              <button type="submit" class="btn-primary">Generate QR code</button>
+            </div>
+            <p class="form-error" id="newQrError"></p>
+          </form>
+
+          <div class="qr-live-preview reticle">
+            <div class="corner tl"></div><div class="corner tr"></div>
+            <div class="corner bl"></div><div class="corner br"></div>
+            <img id="livePreviewImg" alt="QR preview" class="hidden" />
+            <span id="livePreviewPlaceholder">QR preview appears here</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div class="empty-state hidden" id="emptyState">
+        <div class="reticle empty-reticle">
+          <div class="corner tl"></div><div class="corner tr"></div>
+          <div class="corner bl"></div><div class="corner br"></div>
+          <span>◱</span>
+        </div>
+        <h3>No QR codes yet</h3>
+        <p>Generate your first one — static or dynamic — to see it here.</p>
+      </div>
+
+      <!-- QR grid -->
+      <div class="qr-grid" id="qrGrid"></div>
+    </main>
+  </section>
+
+  <!-- ===== EDIT MODAL ===== -->
+  <div class="modal-backdrop hidden" id="editModalBackdrop">
+    <div class="modal reticle">
+      <div class="corner tl"></div><div class="corner tr"></div>
+      <div class="corner bl"></div><div class="corner br"></div>
+      <h3>Edit QR code</h3>
+      <form id="editForm">
+        <input type="hidden" name="id" />
+        <label>Title
+          <input type="text" name="title" required />
+        </label>
+        <label>Destination URL
+          <input type="url" name="destination" required />
+        </label>
+        <p class="modal-note" id="editStaticNote"></p>
+        <div class="panel-actions">
+          <button type="button" class="btn-ghost" id="cancelEdit">Cancel</button>
+          <button type="submit" class="btn-primary">Save changes</button>
+        </div>
+        <p class="form-error" id="editError"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== DELETE CONFIRM MODAL ===== -->
+  <div class="modal-backdrop hidden" id="deleteModalBackdrop">
+    <div class="modal modal-small reticle">
+      <div class="corner tl"></div><div class="corner tr"></div>
+      <div class="corner bl"></div><div class="corner br"></div>
+      <h3>Delete this QR code?</h3>
+      <p class="modal-note">This can't be undone. Anyone who scans it afterward will hit a dead link.</p>
+      <div class="panel-actions">
+        <button type="button" class="btn-ghost" id="cancelDelete">Cancel</button>
+        <button type="button" class="btn-danger" id="confirmDelete">Delete permanently</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast hidden" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+  </html>
